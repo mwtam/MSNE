@@ -38,7 +38,7 @@ impl Player {
         }
     }
 
-    pub fn decide(self, rng: &mut ThreadRng) -> Strategy {
+    pub fn decide(&self, rng: &mut ThreadRng) -> Strategy {
         let mut choice: u32 = rng.gen_range(0..(self.rock + self.paper + self.scissors));
 
         if choice < self.rock {
@@ -63,7 +63,9 @@ fn main() {
     let mut rng = thread_rng();
     rng.gen_range(0..10);
 
-    let player_1 = Player::new();
+    let mut player_1 = Player::new();
     println!("Player 1: {:?}", player_1);
     println!("Player 1 decide: {:?}", player_1.decide(&mut rng));
+
+    player_1.score += 1;
 }
