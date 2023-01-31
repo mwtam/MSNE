@@ -64,18 +64,15 @@ fn main() {
     players.push(Player::new());
     players.push(Player::new());
 
-    use itertools::Itertools;
-    for v in (0..players.len()).combinations(2) {
-        println!("i:{} j:{}", v[0], v[1]);
-        let i = v[0];
-        let j = v[1];
+    for i in 0..players.len() {
+        for j in i..players.len() {
+            let game = (players[i].decide(&mut rng), players[j].decide(&mut rng));
+            println!("Game {i}-{j}: {:?}", game);
+            let result = judge(game.0, game.1);
 
-        let game = (players[i].decide(&mut rng), players[j].decide(&mut rng));
-        println!("Game: {:?}", game);
-        let result = judge(game.0, game.1);
-
-        players[i].score += result.0;
-        players[j].score += result.1;
+            players[i].score += result.0;
+            players[j].score += result.1;
+        }
     }
 
     for player in players {
