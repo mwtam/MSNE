@@ -78,3 +78,9 @@ fn main() {
     println!("Player 1: {:?}", player_1);
     println!("Player 2: {:?}", player_2);
 }
+
+// It is expected playing rock, paper, scissors equally the equilibrium.
+// What if I purposely provide "food" who always play rock.
+// Then playing paper more is good because they can eat the food.
+// However, if so, playing scissors may eat those play paper more.
+// Then who's "food"?
