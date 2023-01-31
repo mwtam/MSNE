@@ -64,7 +64,6 @@ fn main() {
     players.push(Player::new());
     players.push(Player::new());
 
-    // TODO: Wrong. Should not match with oneself.
     for i in 0..players.len() {
         for j in (i+1)..players.len() {
             let game = (players[i].decide(&mut rng), players[j].decide(&mut rng));
