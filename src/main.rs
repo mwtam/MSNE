@@ -56,7 +56,6 @@ impl Player {
 }
 
 fn main() {
-    println!("Hello, world!");
     println!("{:?}", judge(Strategy::Rock, Strategy::Paper));
     println!("{:?}", judge(Strategy::Scissors, Strategy::Paper));
 
@@ -64,8 +63,18 @@ fn main() {
     rng.gen_range(0..10);
 
     let mut player_1 = Player::new();
-    println!("Player 1: {:?}", player_1);
-    println!("Player 1 decide: {:?}", player_1.decide(&mut rng));
+    let mut player_2 = Player::new();
 
-    player_1.score += 1;
+    println!("Player 1: {:?}", player_1);
+    println!("Player 2: {:?}", player_2);
+
+    let game = (player_1.decide(&mut rng), player_2.decide(&mut rng));
+    println!("Game: {:?}", game);
+    let result = judge(game.0, game.1);
+
+    player_1.score += result.0;
+    player_2.score += result.1;
+
+    println!("Player 1: {:?}", player_1);
+    println!("Player 2: {:?}", player_2);
 }
