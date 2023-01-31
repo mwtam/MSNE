@@ -56,27 +56,31 @@ impl Player {
 }
 
 fn main() {
-    println!("{:?}", judge(Strategy::Rock, Strategy::Paper));
-    println!("{:?}", judge(Strategy::Scissors, Strategy::Paper));
-
     let mut rng = thread_rng();
-    rng.gen_range(0..10);
 
-    let mut player_1 = Player::new();
-    let mut player_2 = Player::new();
+    let mut players: Vec<Player> = vec![];
+    players.push(Player::new());
+    players.push(Player::new());
+    players.push(Player::new());
+    players.push(Player::new());
 
-    println!("Player 1: {:?}", player_1);
-    println!("Player 2: {:?}", player_2);
+    use itertools::Itertools;
+    for v in (0..players.len()).combinations(2) {
+        println!("i:{} j:{}", v[0], v[1]);
+        let i = v[0];
+        let j = v[1];
 
-    let game = (player_1.decide(&mut rng), player_2.decide(&mut rng));
-    println!("Game: {:?}", game);
-    let result = judge(game.0, game.1);
+        let game = (players[i].decide(&mut rng), players[j].decide(&mut rng));
+        println!("Game: {:?}", game);
+        let result = judge(game.0, game.1);
 
-    player_1.score += result.0;
-    player_2.score += result.1;
+        players[i].score += result.0;
+        players[j].score += result.1;
+    }
 
-    println!("Player 1: {:?}", player_1);
-    println!("Player 2: {:?}", player_2);
+    for player in players {
+        println!("Player: {:?}", player);
+    }
 }
 
 // It is expected playing rock, paper, scissors equally the equilibrium.
