@@ -116,17 +116,28 @@ fn play_all_pairs(players: &mut Vec<Player>, rng: &mut ThreadRng) {
     }
 }
 
-fn purge_players(players: &mut Vec<Player>, level: i32, rng: &mut ThreadRng) {
-    for player in &mut *players {
-        if player.score < -2<<(16-level) {
-            player.rang_parameters(rng);
-        }
-    }
+fn purge_players(players: &mut Vec<Player>) {
+    players.retain(|player| !player.score.is_negative());
+}
 
+fn level_playground(players: &mut Vec<Player>) {
     for player in &mut *players {
         player.score = 0;
     }
 }
+
+// TODO: Where should I put the rng? It is everywhere now.
+fn reproduce_players(players: &mut Vec<Player>, rng: &mut ThreadRng) {
+    let mut new_players: Vec<Player> = Vec::new();
+    for player in &mut *players {
+        if player.score > 0 {
+            new_players.push(player.give_birth(rng));
+        }
+    }
+
+    players.append(&mut new_players);
+}
+
 
 fn dump(players: &Vec<Player>) {
     for player in players {
@@ -137,28 +148,57 @@ fn dump(players: &Vec<Player>) {
 fn main() {
     let mut rng = thread_rng();
 
-    let mut players: Vec<Player> = vec![];
+    let mut players: Vec<Player> = Vec::new();
     players.push(Player::new().rand_init(&mut rng));
     players.push(Player::new().rand_init(&mut rng));
     players.push(Player::new().rand_init(&mut rng));
     players.push(Player::new());
     players.push(players[0].give_birth(&mut rng));
 
-    // let level = 1;
-    for level in 0..10 {
+    let mut n_no_change = 0;
+
+    for round in 0..1000 {
+        println!("round: {round}");
         // Play a few rounds
-        for _ in 0..1<<16 {
+        for _ in 0..100 {
             play_all_pairs(&mut players, &mut rng);
         }
 
-        dump(&players);
-        purge_players(&mut players, level, &mut rng);
+        // dump(&players);
+        println!("population: {}", players.len());
 
-        println!("--------");
-        dump(&players);
+        if players.len() < 800 {
+            reproduce_players(&mut players, &mut rng);
+            level_playground(&mut players);
+            n_no_change = 0;
+        }
+        if players.len() > 1000 {
+            let n_population = players.len();
+            purge_players(&mut players);
+            level_playground(&mut players);
+            if n_population != players.len() {
+                n_no_change = 0;
+            }
+        }
+        if round % 7 == 0 {
+            let n_population = players.len();
+            purge_players(&mut players);
+            level_playground(&mut players);
+            if n_population != players.len() {
+                n_no_change = 0;
+            }
+        }
 
-        println!("========");
+        n_no_change += 1;
+        if n_no_change > 10 {
+            break;
+        }
+        // println!("--------");
+        // dump(&players);
+
+        // println!("========");
     }
+    dump(&players);
 }
 
 // It is expected playing rock, paper, scissors equally the equilibrium.
