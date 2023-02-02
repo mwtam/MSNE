@@ -30,7 +30,7 @@ struct Player {
     score: i32,
 }
 impl Player {
-    pub fn new() -> Player {
+    pub fn new() -> Self {
         Player {
             rock: 100000,
             paper: 100000,
@@ -45,7 +45,7 @@ impl Player {
         self.scissors = rng.gen_range(1..(u32::MAX>>12));
     }
 
-    pub fn rand_init(mut self, rng: &mut ThreadRng) -> Player {
+    pub fn rand_init(mut self, rng: &mut ThreadRng) -> Self {
         self.rang_parameters(rng);
         self
     }
@@ -80,7 +80,7 @@ impl Player {
         }
     }
 
-    pub fn give_birth(&self, rng: &mut ThreadRng) -> Player {
+    pub fn give_birth(&self, rng: &mut ThreadRng) -> Self {
         let mut player_offspring = self.clone();
         player_offspring.evolute(rng);
         player_offspring
@@ -200,6 +200,8 @@ fn main() {
     }
     dump(&players);
 }
+
+// TODO: Make it multithread for learning Rust and faster.
 
 // It is expected playing rock, paper, scissors equally the equilibrium.
 // What if I purposely provide "food" who always play rock.
