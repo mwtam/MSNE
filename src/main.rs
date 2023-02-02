@@ -12,12 +12,17 @@ fn judge(player1_strategy: Strategy, player2_strategy: Strategy) -> (i32, i32) {
         (Strategy::Rock, Strategy::Rock) => (0, 0),
         (Strategy::Paper, Strategy::Paper) => (0, 0),
         (Strategy::Scissors, Strategy::Scissors) => (0, 0),
-        (Strategy::Rock, Strategy::Paper) => (-1, 1),
-        (Strategy::Paper, Strategy::Scissors) => (-1, 1),
-        (Strategy::Scissors, Strategy::Rock) => (-1, 1),
-        (Strategy::Paper, Strategy::Rock) => (1, -1),
+
         (Strategy::Scissors, Strategy::Paper) => (1, -1),
+        (Strategy::Paper, Strategy::Scissors) => (-1, 1),
+
+        (Strategy::Rock, Strategy::Paper) => (-2, 2),
+        (Strategy::Paper, Strategy::Rock) => (2, -2),
+        // According to https://youtu.be/qOLXyFchZfY
+        // The result is rock 1/4, paper 1/4, scissors 1/2
+
         (Strategy::Rock, Strategy::Scissors) => (1, -1),
+        (Strategy::Scissors, Strategy::Rock) => (-1, 1),
     }
 }
 
@@ -39,6 +44,21 @@ impl Player {
         }
     }
 
+    pub fn init_rock(mut self, rock: u32) -> Self {
+        self.rock = rock;
+        self
+    }
+
+    pub fn init_paper(mut self, paper: u32) -> Self {
+        self.paper = paper;
+        self
+    }
+
+    pub fn init_scissors(mut self, scissors: u32) -> Self {
+        self.scissors = scissors;
+        self
+    }
+
     pub fn rang_parameters(&mut self, rng: &mut ThreadRng) {
         self.rock = rng.gen_range(1..(u32::MAX>>12));
         self.paper = rng.gen_range(1..(u32::MAX>>12));
@@ -55,17 +75,17 @@ impl Player {
         // Why plus only?
         // The actual number does not affect the chance.
         // Only the relative ratio counts.
-        self.rock += rng.gen_range(0..1000);
-        self.paper += rng.gen_range(0..1000);
-        self.scissors += rng.gen_range(0..1000);
+        self.rock += rng.gen_range(0..100000);
+        self.paper += rng.gen_range(0..100000);
+        self.scissors += rng.gen_range(0..100000);
 
         // Cap the max at u32::MAX>>11
         if self.rock > u32::MAX>>11 || 
            self.paper > u32::MAX>>11 || 
            self.scissors > u32::MAX>>11 {
             self.rock = self.rock>>1;
-            self.paper = self.rock>>1;
-            self.scissors = self.rock>>1;
+            self.paper = self.paper>>1;
+            self.scissors = self.scissors>>1;
         }
 
         // Cap the min at 0
@@ -149,18 +169,47 @@ fn main() {
     let mut rng = thread_rng();
 
     let mut players: Vec<Player> = Vec::new();
+
+    // players.push(Player::new()
+    //     .init_rock(100000)
+    //     .init_paper(1000)
+    //     .init_scissors(1000)
+    // );
+
+    // players.push(Player::new()
+    //     .init_rock(1000)
+    //     .init_paper(100000)
+    //     .init_scissors(1000)
+    // );
+
+    // players.push(Player::new()
+    //     .init_rock(1000)
+    //     .init_paper(1000)
+    //     .init_scissors(100000)
+    // );
+
     players.push(Player::new().rand_init(&mut rng));
     players.push(Player::new().rand_init(&mut rng));
     players.push(Player::new().rand_init(&mut rng));
-    players.push(Player::new());
-    players.push(players[0].give_birth(&mut rng));
+    players.push(Player::new().rand_init(&mut rng));
+    players.push(Player::new().rand_init(&mut rng));
+    players.push(Player::new().rand_init(&mut rng));
+    players.push(Player::new().rand_init(&mut rng));
+    players.push(Player::new().rand_init(&mut rng));
+    players.push(Player::new().rand_init(&mut rng));
+    players.push(Player::new().rand_init(&mut rng));
+
+    // players.push(Player::new());
+    // players.push(players[0].give_birth(&mut rng));
+
+    dump(&players);
 
     let mut n_no_change = 0;
 
     for round in 0..1000 {
         println!("round: {round}");
         // Play a few rounds
-        for _ in 0..100 {
+        for _ in 0..7 {
             play_all_pairs(&mut players, &mut rng);
         }
 
@@ -180,7 +229,7 @@ fn main() {
                 n_no_change = 0;
             }
         }
-        if round % 7 == 0 {
+        if round % 7 == 3 {
             let n_population = players.len();
             purge_players(&mut players);
             level_playground(&mut players);
