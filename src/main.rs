@@ -39,11 +39,14 @@ impl Player {
         }
     }
 
-    pub fn rand_init(mut self, rng: &mut ThreadRng) -> Player {
+    pub fn rang_parameters(&mut self, rng: &mut ThreadRng) {
         self.rock = rng.gen_range(1..(u32::MAX>>12));
         self.paper = rng.gen_range(1..(u32::MAX>>12));
         self.scissors = rng.gen_range(1..(u32::MAX>>12));
+    }
 
+    pub fn rand_init(mut self, rng: &mut ThreadRng) -> Player {
+        self.rang_parameters(rng);
         self
     }
 
@@ -100,6 +103,37 @@ impl Player {
     }
 }
 
+fn play_all_pairs(players: &mut Vec<Player>, rng: &mut ThreadRng) {
+    for i in 0..players.len() {
+        for j in (i+1)..players.len() {
+            let game = (players[i].decide(rng), players[j].decide(rng));
+            // println!("Game {i}-{j}: {:?}", game);
+            let result = judge(game.0, game.1);
+
+            players[i].score += result.0;
+            players[j].score += result.1;
+        }
+    }
+}
+
+fn purge_players(players: &mut Vec<Player>, level: i32, rng: &mut ThreadRng) {
+    for player in &mut *players {
+        if player.score < -2<<(16-level) {
+            player.rang_parameters(rng);
+        }
+    }
+
+    for player in &mut *players {
+        player.score = 0;
+    }
+}
+
+fn dump(players: &Vec<Player>) {
+    for player in players {
+        println!("Player: {:?}", player);
+    }
+}
+
 fn main() {
     let mut rng = thread_rng();
 
@@ -110,26 +144,20 @@ fn main() {
     players.push(Player::new());
     players.push(players[0].give_birth(&mut rng));
 
-    // let mut player_offspring = players[0].clone();
-    // player_offspring.evolute(&mut rng);
-    // players.push(player_offspring);
-
-    // Play a few rounds
-    for _ in 0..100000 {
-        for i in 0..players.len() {
-            for j in (i+1)..players.len() {
-                let game = (players[i].decide(&mut rng), players[j].decide(&mut rng));
-                // println!("Game {i}-{j}: {:?}", game);
-                let result = judge(game.0, game.1);
-
-                players[i].score += result.0;
-                players[j].score += result.1;
-            }
+    // let level = 1;
+    for level in 0..10 {
+        // Play a few rounds
+        for _ in 0..1<<16 {
+            play_all_pairs(&mut players, &mut rng);
         }
-    }
 
-    for player in players {
-        println!("Player: {:?}", player);
+        dump(&players);
+        purge_players(&mut players, level, &mut rng);
+
+        println!("--------");
+        dump(&players);
+
+        println!("========");
     }
 }
 
