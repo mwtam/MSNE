@@ -16,10 +16,13 @@ fn judge(player1_strategy: Strategy, player2_strategy: Strategy) -> (i32, i32) {
         (Strategy::Scissors, Strategy::Paper) => (1, -1),
         (Strategy::Paper, Strategy::Scissors) => (-1, 1),
 
-        (Strategy::Rock, Strategy::Paper) => (-2, 2),
         (Strategy::Paper, Strategy::Rock) => (2, -2),
-        // According to https://youtu.be/qOLXyFchZfY
-        // The result is rock 1/4, paper 1/4, scissors 1/2
+        (Strategy::Rock, Strategy::Paper) => (-2, 2),
+        // // According to https://youtu.be/qOLXyFchZfY
+        // // The result is rock 1/4, paper 1/4, scissors 1/2
+
+        // (Strategy::Paper, Strategy::Rock) => (1, -1),
+        // (Strategy::Rock, Strategy::Paper) => (-1, 1),
 
         (Strategy::Rock, Strategy::Scissors) => (1, -1),
         (Strategy::Scissors, Strategy::Rock) => (-1, 1),
@@ -75,9 +78,14 @@ impl Player {
         // Why plus only?
         // The actual number does not affect the chance.
         // Only the relative ratio counts.
-        self.rock += rng.gen_range(0..100000);
-        self.paper += rng.gen_range(0..100000);
-        self.scissors += rng.gen_range(0..100000);
+
+        // self.rock += rng.gen_range(0..1000);
+        // self.paper += rng.gen_range(0..1000);
+        // self.scissors += rng.gen_range(0..1000);
+
+        self.rock += (self.rock * rng.gen_range(1..10)) / 100;
+        self.paper += (self.paper * rng.gen_range(1..10)) / 100;
+        self.scissors += (self.scissors * rng.gen_range(1..10)) / 100;
 
         // Cap the max at u32::MAX>>11
         if self.rock > u32::MAX>>11 || 
@@ -102,7 +110,11 @@ impl Player {
 
     pub fn give_birth(&self, rng: &mut ThreadRng) -> Self {
         let mut player_offspring = self.clone();
-        player_offspring.evolute(rng);
+        if !(player_offspring.rock == 189541 &&
+           player_offspring.paper == 189541 &&
+           player_offspring.scissors == 189541 * 2) {
+            player_offspring.evolute(rng);
+        }
         player_offspring
     }
 
@@ -188,16 +200,38 @@ fn main() {
     //     .init_scissors(100000)
     // );
 
-    players.push(Player::new().rand_init(&mut rng));
-    players.push(Player::new().rand_init(&mut rng));
-    players.push(Player::new().rand_init(&mut rng));
-    players.push(Player::new().rand_init(&mut rng));
-    players.push(Player::new().rand_init(&mut rng));
-    players.push(Player::new().rand_init(&mut rng));
-    players.push(Player::new().rand_init(&mut rng));
-    players.push(Player::new().rand_init(&mut rng));
-    players.push(Player::new().rand_init(&mut rng));
-    players.push(Player::new().rand_init(&mut rng));
+    // 189541 is magic number to skip evolve
+    // A quick and dirty hack
+    // TODO: Add a enum Species to indicate any special treatment
+    players.push(Player::new()
+        .init_rock(189541)
+        .init_paper(189541)
+        .init_scissors(189541*2)
+    );
+    
+
+    players.push(Player::new()
+        .init_rock(100000)
+        .init_paper(100000)
+        .init_scissors(200000)
+    );
+
+    players.push(Player::new()
+        .init_rock(100000)
+        .init_paper(100000)
+        .init_scissors(200000)
+    );
+
+    // players.push(Player::new().rand_init(&mut rng));
+    // players.push(Player::new().rand_init(&mut rng));
+    // players.push(Player::new().rand_init(&mut rng));
+    // players.push(Player::new().rand_init(&mut rng));
+    // players.push(Player::new().rand_init(&mut rng));
+    // players.push(Player::new().rand_init(&mut rng));
+    // players.push(Player::new().rand_init(&mut rng));
+    // players.push(Player::new().rand_init(&mut rng));
+    // players.push(Player::new().rand_init(&mut rng));
+    // players.push(Player::new().rand_init(&mut rng));
 
     // players.push(Player::new());
     // players.push(players[0].give_birth(&mut rng));
@@ -206,10 +240,10 @@ fn main() {
 
     let mut n_no_change = 0;
 
-    for round in 0..1000 {
+    for round in 0..2000 {
         println!("round: {round}");
         // Play a few rounds
-        for _ in 0..7 {
+        for _ in 0..17 {
             play_all_pairs(&mut players, &mut rng);
         }
 
