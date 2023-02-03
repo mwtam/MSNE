@@ -186,10 +186,18 @@ fn reproduce_players(players: &mut Vec<Player>, rng: &mut ThreadRng) {
     }
 
     for _ in 0..players.len() {
+    // for _ in 0..10 {
         // See how the "food" affects the result
+        // players.push(Player::new()
+        //     .init_rock(100000)
+        //     .init_paper(1)
+        //     .init_scissors(1)
+        //     .init_evolve(0)
+        // );
+
         players.push(Player::new()
-            .init_rock(100000)
-            .init_paper(1)
+            .init_rock(1)
+            .init_paper(100000)
             .init_scissors(1)
             .init_evolve(0)
         );
@@ -239,14 +247,14 @@ fn main() {
     players.push(Player::new()
         .init_rock(100000)
         .init_paper(100000)
-        .init_scissors(100000)
+        .init_scissors(200000)
         .init_evolve(1000)
     );
 
     players.push(Player::new()
         .init_rock(100000)
         .init_paper(100000)
-        .init_scissors(100000)
+        .init_scissors(200000)
         .init_evolve(1000)
     );
 
@@ -313,10 +321,5 @@ fn main() {
     dump(&players);
 }
 
-// TODO: Make it multithread for learning Rust and faster.
-
-// It is expected playing rock, paper, scissors equally the equilibrium.
-// What if I purposely provide "food" who always play rock.
-// Then playing paper more is good because they can eat the food.
-// However, if so, playing scissors may eat those play paper more.
-// Then who's "food"?
+// TODO: Add tests
+// TODO: Make it multithread, for learning Rust, and the speed.
