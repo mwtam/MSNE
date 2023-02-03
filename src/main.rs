@@ -36,6 +36,7 @@ struct Player {
     paper: u32,
     scissors: u32,
     score: i32,
+    evolve_pt: u32, // 1/10000
 }
 impl Player {
     pub fn new() -> Self {
@@ -44,6 +45,7 @@ impl Player {
             paper: 100000,
             scissors: 100000,
             score: 0,
+            evolve_pt: 1000,
         }
     }
 
@@ -62,6 +64,11 @@ impl Player {
         self
     }
 
+    pub fn init_evolve(mut self, evolve_pt: u32) -> Self {
+        self.evolve_pt = evolve_pt;
+        self
+    }
+
     pub fn rang_parameters(&mut self, rng: &mut ThreadRng) {
         self.rock = rng.gen_range(1..(u32::MAX>>12));
         self.paper = rng.gen_range(1..(u32::MAX>>12));
@@ -73,7 +80,10 @@ impl Player {
         self
     }
 
-    pub fn evolute(&mut self, rng: &mut ThreadRng) {
+    pub fn evolve(&mut self, rng: &mut ThreadRng) {
+        if self.evolve_pt == 0 {
+            return;
+        }
         // Mutation
         // Why plus only?
         // The actual number does not affect the chance.
@@ -83,9 +93,9 @@ impl Player {
         // self.paper += rng.gen_range(0..1000);
         // self.scissors += rng.gen_range(0..1000);
 
-        self.rock += (self.rock * rng.gen_range(1..10)) / 100;
-        self.paper += (self.paper * rng.gen_range(1..10)) / 100;
-        self.scissors += (self.scissors * rng.gen_range(1..10)) / 100;
+        self.rock += (self.rock * rng.gen_range(0..self.evolve_pt)) / 10000;
+        self.paper += (self.paper * rng.gen_range(0..self.evolve_pt)) / 10000;
+        self.scissors += (self.scissors * rng.gen_range(0..self.evolve_pt)) / 10000;
 
         // Cap the max at u32::MAX>>11
         if self.rock > u32::MAX>>11 || 
@@ -108,12 +118,18 @@ impl Player {
         }
     }
 
-    pub fn give_birth(&self, rng: &mut ThreadRng) -> Self {
+    pub fn give_birth(&mut self, rng: &mut ThreadRng) -> Self {
         let mut player_offspring = self.clone();
-        if !(player_offspring.rock == 189541 &&
-           player_offspring.paper == 189541 &&
-           player_offspring.scissors == 189541 * 2) {
-            player_offspring.evolute(rng);
+
+        // This version is good. Make it more stable
+        for _ in 0..5 {
+            if self.evolve_pt > 1 {
+                self.evolve_pt -= 1;
+            }
+        }
+
+        if player_offspring.evolve_pt > 0 {
+            player_offspring.evolve(rng);
         }
         player_offspring
     }
@@ -200,26 +216,26 @@ fn main() {
     //     .init_scissors(100000)
     // );
 
-    // 189541 is magic number to skip evolve
-    // A quick and dirty hack
-    // TODO: Add a enum Species to indicate any special treatment
-    players.push(Player::new()
-        .init_rock(189541)
-        .init_paper(189541)
-        .init_scissors(189541*2)
-    );
+    // players.push(Player::new()
+    //     .init_rock(189541)
+    //     .init_paper(189541)
+    //     .init_scissors(189541*2)
+    //     .init_evolve(0)
+    // );
     
 
     players.push(Player::new()
         .init_rock(100000)
         .init_paper(100000)
-        .init_scissors(200000)
+        .init_scissors(100000)
+        .init_evolve(1000)
     );
 
     players.push(Player::new()
         .init_rock(100000)
         .init_paper(100000)
-        .init_scissors(200000)
+        .init_scissors(100000)
+        .init_evolve(1000)
     );
 
     // players.push(Player::new().rand_init(&mut rng));
@@ -263,6 +279,7 @@ fn main() {
                 n_no_change = 0;
             }
         }
+
         if round % 7 == 3 {
             let n_population = players.len();
             purge_players(&mut players);
