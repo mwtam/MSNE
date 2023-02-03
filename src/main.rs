@@ -177,10 +177,22 @@ fn level_playground(players: &mut Vec<Player>) {
 // TODO: Where should I put the rng? It is everywhere now.
 fn reproduce_players(players: &mut Vec<Player>, rng: &mut ThreadRng) {
     let mut new_players: Vec<Player> = Vec::new();
+    new_players.reserve(players.len() * 2);
+
     for player in &mut *players {
         if player.score > 0 {
             new_players.push(player.give_birth(rng));
         }
+    }
+
+    for _ in 0..players.len() {
+        // See how the "food" affects the result
+        players.push(Player::new()
+            .init_rock(100000)
+            .init_paper(1)
+            .init_scissors(1)
+            .init_evolve(0)
+        );
     }
 
     players.append(&mut new_players);
