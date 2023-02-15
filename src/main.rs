@@ -183,6 +183,9 @@ fn test_purge_players() {
         .init_scissors(1)
         .init_evolve(0)
     );
+
+
+    // Score < 0 removed, score > 0 remains.
     players[0].score += -1;
     players[1].score += 1;
 
@@ -191,6 +194,19 @@ fn test_purge_players() {
     purge_players(&mut players);
 
     assert!(players.len() == 1, "Expect 1 player, see {}, players: {:?}", players.len(), players);
+
+
+    // Score == 0 remains, do not remove.
+    players.push(Player::new()
+        .init_rock(1)
+        .init_paper(1)
+        .init_scissors(300000)
+        .init_evolve(0)
+    );
+
+    purge_players(&mut players);
+
+    assert!(players.len() == 2, "Expect 2 players, see {}, players: {:?}", players.len(), players);
 }
 
 
