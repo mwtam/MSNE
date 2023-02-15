@@ -168,6 +168,32 @@ fn purge_players(players: &mut Vec<Player>) {
     players.retain(|player| !player.score.is_negative());
 }
 
+#[test]
+fn test_purge_players() {
+    let mut players: Vec<Player> = Vec::new();
+    players.push(Player::new()
+        .init_rock(100000)
+        .init_paper(1)
+        .init_scissors(1)
+        .init_evolve(0)
+    );
+    players.push(Player::new()
+        .init_rock(1)
+        .init_paper(200000)
+        .init_scissors(1)
+        .init_evolve(0)
+    );
+    players[0].score += -1;
+    players[1].score += 1;
+
+    assert!(players.len() == 2);
+
+    purge_players(&mut players);
+
+    assert!(players.len() == 1, "Expect 1 player, see {}, players: {:?}", players.len(), players);
+}
+
+
 fn level_playground(players: &mut Vec<Player>) {
     for player in &mut *players {
         player.score = 0;
@@ -186,21 +212,20 @@ fn reproduce_players(players: &mut Vec<Player>, rng: &mut ThreadRng) {
     }
 
     for _ in 0..players.len() {
-    // for _ in 0..10 {
         // See how the "food" affects the result
-        // players.push(Player::new()
-        //     .init_rock(100000)
-        //     .init_paper(1)
-        //     .init_scissors(1)
-        //     .init_evolve(0)
-        // );
-
         players.push(Player::new()
-            .init_rock(1)
-            .init_paper(100000)
+            .init_rock(100000)
+            .init_paper(1)
             .init_scissors(1)
             .init_evolve(0)
         );
+
+        // players.push(Player::new()
+        //     .init_rock(1)
+        //     .init_paper(100000)
+        //     .init_scissors(1)
+        //     .init_evolve(0)
+        // );
     }
 
     players.append(&mut new_players);
@@ -236,12 +261,20 @@ fn main() {
     //     .init_scissors(100000)
     // );
 
-    // players.push(Player::new()
-    //     .init_rock(189541)
-    //     .init_paper(189541)
-    //     .init_scissors(189541*2)
-    //     .init_evolve(0)
-    // );
+    for _ in 0..10 {
+        players.push(Player::new()
+            .init_rock(189541)
+            .init_paper(189541)
+            .init_scissors(189541*2)
+            .init_evolve(0)
+        );
+        players.push(Player::new()
+            .init_rock(100000)
+            .init_paper(1)
+            .init_scissors(1)
+            .init_evolve(0)
+        );
+    }
     
 
     players.push(Player::new()
@@ -276,7 +309,8 @@ fn main() {
 
     let mut n_no_change = 0;
 
-    for round in 0..2000 {
+    // for round in 0..2000 {
+    for round in 0..200 {
         println!("round: {round}");
         // Play a few rounds
         for _ in 0..17 {
