@@ -164,6 +164,33 @@ fn play_all_pairs(players: &mut Vec<Player>, rng: &mut ThreadRng) {
     }
 }
 
+#[test]
+fn test_play_all_pairs() {
+    let mut rng = thread_rng();
+
+    let mut players: Vec<Player> = Vec::new();
+
+    for _ in 0..10 {
+        players.push(Player::new()
+            .rand_init(&mut rng)
+            .init_evolve(0)
+        );
+    }
+
+    play_all_pairs(&mut players, &mut rng);
+
+    let mut score_sum = 0;
+    for player in &players {
+        score_sum += player.score;
+    }
+
+    assert!(score_sum == 0, "Expect zero-sum game, see {}. \
+        Both the code and the scoring table could be the problem. \
+        players: {:?}", score_sum, players);
+
+}
+
+
 fn purge_players(players: &mut Vec<Player>) {
     players.retain(|player| !player.score.is_negative());
 }
