@@ -16,8 +16,11 @@ fn judge(player1_strategy: Strategy, player2_strategy: Strategy) -> (i32, i32) {
         (Strategy::Scissors, Strategy::Paper) => (1, -1),
         (Strategy::Paper, Strategy::Scissors) => (-1, 1),
 
-        (Strategy::Paper, Strategy::Rock) => (2, -2),
-        (Strategy::Rock, Strategy::Paper) => (-2, 2),
+        (Strategy::Paper, Strategy::Rock) => (1, -1),
+        (Strategy::Rock, Strategy::Paper) => (-1, 1),
+
+        // (Strategy::Paper, Strategy::Rock) => (2, -2),
+        // (Strategy::Rock, Strategy::Paper) => (-2, 2),
         // // According to https://youtu.be/qOLXyFchZfY
         // // The result is rock 1/4, paper 1/4, scissors 1/2
 
@@ -254,22 +257,22 @@ fn reproduce_players(players: &mut Vec<Player>, rng: &mut ThreadRng) {
         }
     }
 
-    for _ in 0..players.len() {
-        // See how the "food" affects the result
-        players.push(Player::new()
-            .init_rock(100000)
-            .init_paper(1)
-            .init_scissors(1)
-            .init_evolve(0)
-        );
+    // for _ in 0..players.len() {
+    //     // See how the "food" affects the result
+    //     players.push(Player::new()
+    //         .init_rock(100000)
+    //         .init_paper(1)
+    //         .init_scissors(1)
+    //         .init_evolve(0)
+    //     );
 
-        // players.push(Player::new()
-        //     .init_rock(1)
-        //     .init_paper(100000)
-        //     .init_scissors(1)
-        //     .init_evolve(0)
-        // );
-    }
+    //     // players.push(Player::new()
+    //     //     .init_rock(1)
+    //     //     .init_paper(100000)
+    //     //     .init_scissors(1)
+    //     //     .init_evolve(0)
+    //     // );
+    // }
 
     players.append(&mut new_players);
 }
@@ -304,35 +307,49 @@ fn main() {
     //     .init_scissors(100000)
     // );
 
+    // for _ in 0..10 {
+    //     players.push(Player::new()
+    //         .init_rock(189541)
+    //         .init_paper(189541)
+    //         .init_scissors(189541*2)
+    //         .init_evolve(0)
+    //     );
+    //     players.push(Player::new()
+    //         .init_rock(100000)
+    //         .init_paper(1)
+    //         .init_scissors(1)
+    //         .init_evolve(0)
+    //     );
+    // }
+    
+    players.push(Player::new()
+        .init_rock(100000)
+        .init_paper(100000)
+        .init_scissors(100000)
+        .init_evolve(1000)
+    );
+
+    players.push(Player::new()
+        .init_rock(100000)
+        .init_paper(100000)
+        .init_scissors(200000)
+        .init_evolve(1000)
+    );
+
     for _ in 0..10 {
         players.push(Player::new()
-            .init_rock(189541)
-            .init_paper(189541)
-            .init_scissors(189541*2)
-            .init_evolve(0)
-        );
-        players.push(Player::new()
-            .init_rock(100000)
-            .init_paper(1)
-            .init_scissors(1)
-            .init_evolve(0)
+            .rand_init(&mut rng)
+            .init_evolve(1000)
         );
     }
-    
 
     players.push(Player::new()
         .init_rock(100000)
         .init_paper(100000)
-        .init_scissors(200000)
-        .init_evolve(1000)
+        .init_scissors(100000)
+        .init_evolve(0)
     );
 
-    players.push(Player::new()
-        .init_rock(100000)
-        .init_paper(100000)
-        .init_scissors(200000)
-        .init_evolve(1000)
-    );
 
     // players.push(Player::new().rand_init(&mut rng));
     // players.push(Player::new().rand_init(&mut rng));
@@ -353,7 +370,7 @@ fn main() {
     let mut n_no_change = 0;
 
     // for round in 0..2000 {
-    for round in 0..200 {
+    for round in 0..2000 {
         println!("round: {round}");
         // Play a few rounds
         for _ in 0..17 {
