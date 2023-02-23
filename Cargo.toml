@@ -11,4 +11,3 @@ debug = true
 
 [dependencies]
 rand = "0.8.5"
-itertools = "0.10.5"
