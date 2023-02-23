@@ -369,7 +369,6 @@ fn main() {
 
     let mut n_no_change = 0;
 
-    // for round in 0..2000 {
     for round in 0..2000 {
         println!("round: {round}");
         // Play a few rounds
@@ -415,5 +414,4 @@ fn main() {
     dump(&players);
 }
 
-// TODO: Add tests
 // TODO: Make it multithread, for learning Rust, and the speed.
